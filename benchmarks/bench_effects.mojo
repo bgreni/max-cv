@@ -17,7 +17,7 @@ fn pixellate(mut bench: Bench) raises:
     var outtensor = gen_tensor[Output](cpu)
 
     var els = intensor.size
-    var elements = ThroughputMeasure(BenchMetric.elements, els)
+    var elements = [ThroughputMeasure(BenchMetric.elements, els)]
 
     @parameter
     fn bench_cpu(mut b: Bencher) raises:

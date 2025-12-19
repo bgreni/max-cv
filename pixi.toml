@@ -1,4 +1,4 @@
-[project]
+[workspace]
 authors = ["Brad Larson <larson@sunsetlakesoftware.com>"]
 channels = ["conda-forge", "https://conda.modular.com/max-nightly"]
 description = "MAX-CV: Accelerated image processing via MAX and Mojo"
@@ -43,11 +43,11 @@ format_mojo = "mojo format max_cv/operations_mojo benchmarks -l 80"
 
 [feature.format.dependencies]
 ruff = ">=0.14.0,<0.15"
-mojo = ">=0.25.7.0.dev2025101405,<0.26"
+mojo = ">=0.26.1.0.dev2025121805,<27"
 
 [dependencies]
 pillow = ">=11.0.0,<12"
-max = ">=25.7.0.dev2025101405,<26"
+max = ">=26.1.0.dev2025121805,<27"
 
 [environments]
 default = { solve-group = "default" }

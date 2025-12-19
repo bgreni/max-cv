@@ -21,7 +21,7 @@ fn draw_circle(mut bench: Bench) raises:
     center.tensor[1] = intensor.size // 2
 
     var els = intensor.size
-    var elements = ThroughputMeasure(BenchMetric.elements, els)
+    var elements = [ThroughputMeasure(BenchMetric.elements, els)]
 
     @parameter
     fn bench_cpu(mut b: Bencher) raises:
@@ -43,14 +43,12 @@ fn draw_circle(mut bench: Bench) raises:
     bench.bench_function[bench_cpu](BenchId("draw_circle", "cpu"), elements)
 
     @parameter
-    if False:  # GPU crashes - complex indexing with center tensor access
+    if has_accelerator():
         var gpu = DeviceContext()
         var gpu_intensor = gen_tensor[Input](gpu)
         var gpu_outtensor = gen_tensor[Output](gpu)
         var gpu_color = gen_color_tensor(gpu)
-        var gpu_center = BenchTensor[Input, point_spec](gpu)
-        gpu_center.tensor[0] = gpu_intensor.size // 2
-        gpu_center.tensor[1] = gpu_intensor.size // 2
+
 
         @parameter
         fn bench_gpu(mut b: Bencher) raises:
@@ -63,10 +61,10 @@ fn draw_circle(mut bench: Bench) raises:
                     120.0,
                     gpu_color.tensor,
                     5.0,
-                    gpu_center.tensor,
+                    center.tensor,
                     gpu,
                 )
 
             b.iter[run]()
 
-        bench.bench_function[bench_gpu](BenchId("draw_circle", "gpu"), elements)
+        bench.bench_function[bench_gpu](BenchId("draw_circle", "gpu"), List(elements))

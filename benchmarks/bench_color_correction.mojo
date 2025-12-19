@@ -18,7 +18,7 @@ fn brightness(mut bench: Bench) raises:
     var outtensor = gen_tensor[Output](cpu)
     var intensor = gen_tensor[Input](cpu)
     var els = intensor.size
-    var elements = ThroughputMeasure(BenchMetric.elements, els)
+    var elements = [ThroughputMeasure(BenchMetric.elements, els)]
 
     @parameter
     fn bench_cpu(mut b: Bencher) raises:
@@ -58,7 +58,7 @@ fn gamma(mut bench: Bench) raises:
     var outtensor = gen_tensor[Output](cpu)
     var intensor = gen_tensor[Input](cpu)
     var els = intensor.size
-    var elements = ThroughputMeasure(BenchMetric.elements, els)
+    var elements = [ThroughputMeasure(BenchMetric.elements, els)]
 
     @parameter
     fn bench_cpu(mut b: Bencher) raises:
@@ -96,7 +96,7 @@ fn luminance(mut bench: Bench) raises:
     var outtensor = gen_tensor[Output](cpu)
     var intensor = gen_tensor[Input](cpu)
     var els = intensor.size
-    var elements = ThroughputMeasure(BenchMetric.elements, els)
+    var elements = [ThroughputMeasure(BenchMetric.elements, els)]
 
     @parameter
     fn bench_cpu(mut b: Bencher) raises:
