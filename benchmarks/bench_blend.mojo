@@ -18,9 +18,9 @@ fn blend(mut bench: Bench) raises:
     var outtensor = gen_tensor[Output](cpu)
 
     var els = background_image.size
-    var elements = ThroughputMeasure(BenchMetric.elements, els)
+    var elements = [ThroughputMeasure(BenchMetric.elements, els)]
 
-    alias DT = DType.float32
+    comptime DT = DType.float32
 
     @parameter
     fn bench_blend[mode: StringLiteral]() raises:

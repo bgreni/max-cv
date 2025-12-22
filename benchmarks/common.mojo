@@ -9,13 +9,13 @@ from random import rand
 from utils import IndexList
 from sys import size_of, has_accelerator, CompilationTarget
 
-alias dtype = DType.float32
-alias rank = 3
-alias tspec = _static_spec[dtype, rank](
+comptime dtype = DType.float32
+comptime rank = 3
+comptime tspec = _static_spec[dtype, rank](
     shape=DimList(600, 400, 3), strides=DimList(400, 3, 1)
 )
-alias point_spec = _static_spec[dtype, 1](shape=DimList(2), strides=DimList(1))
-alias color_spec = _static_spec[dtype, 1](shape=DimList(3), strides=DimList(1))
+comptime point_spec = _static_spec[dtype, 1](shape=DimList(2), strides=DimList(1))
+comptime color_spec = _static_spec[dtype, 1](shape=DimList(3), strides=DimList(1))
 
 
 fn gen_tensor[
@@ -52,25 +52,26 @@ struct BenchTensor[
     io_spec: IOSpec,
     static_spec: StaticTensorSpec[dtype, rank],
 ](Copyable, Movable):
-    alias tensor_type = ManagedTensorSlice[
-        io_spec=io_spec, static_spec=static_spec
+    comptime tensor_type = ManagedTensorSlice[
+        io_spec=Self.io_spec, static_spec=Self.static_spec
     ]
-    alias buffer_type = DeviceBuffer[dtype]
-    alias ptr_type = UnsafePointer[Scalar[dtype]]
-    alias size = Int(static_spec.shape.product())
+    comptime buffer_type = DeviceBuffer[Self.dtype]
+    comptime ptr_type = UnsafePointer[Scalar[Self.dtype]]
+    comptime size = Int(Self.static_spec.shape.product())
 
     var tensor: Self.tensor_type
     var buffer: Self.buffer_type
 
     fn __init__(out self, ctx: DeviceContext) raises:
-        self.buffer = ctx.enqueue_create_buffer[dtype](Self.size)
+        self.buffer = ctx.enqueue_create_buffer[Self.dtype](Self.size)
+        ctx.synchronize()
 
         self.tensor = ManagedTensorSlice[
-            io_spec=io_spec, static_spec=static_spec
+            io_spec=Self.io_spec, static_spec=Self.static_spec
         ](
             self.buffer.unsafe_ptr(),
-            Self.static_spec.shape.into_index_list[rank](),
-            Self.static_spec.strides.into_index_list[rank](),
+            Self.static_spec.shape.into_index_list[Self.rank](),
+            Self.static_spec.strides.into_index_list[Self.rank](),
         )
 
     fn unsafe_ptr(self) -> Self.ptr_type:
