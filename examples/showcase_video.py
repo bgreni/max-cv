@@ -47,13 +47,15 @@ def sobel(value, camera, file):
         run_pipeline_video_file(operations=edge_detection, path=file)
 
 
-def create_pipeline(operations: Callable, sample_frame: Tensor) -> ImagePipeline:
+def create_pipeline(
+    operations: Callable, sample_frame: Tensor, flip: bool = False
+) -> ImagePipeline:
     # Place the graph on a GPU, if available. Fall back to CPU if not.
     device: Device
 
     try:
         # Unsupported accelerators will throw an error here
-        device = Accelerator()
+        device = Accelerator() if system() != "Darwin" else CPU()
     except ValueError:
         device = CPU()
 
@@ -65,6 +67,8 @@ def create_pipeline(operations: Callable, sample_frame: Tensor) -> ImagePipeline
         num_inputs=1,
     ) as pipeline:
         processed_image = operations(device, pipeline.input_image)
+        if flip:
+            processed_image = ops.flip(device, processed_image, ops.FlipCode.HORIZONTAL)
         pipeline.output(processed_image)
 
     print("Compiling graph...")
@@ -112,7 +116,7 @@ def run_pipeline_live_video(operations: Callable):
         return
 
     ret, frame = cap.read()
-    pipeline = create_pipeline(operations, Tensor.from_numpy(frame))
+    pipeline = create_pipeline(operations, Tensor.from_numpy(frame), flip=True)
 
     while True:
         ret, frame = cap.read()
@@ -120,8 +124,6 @@ def run_pipeline_live_video(operations: Callable):
         if not ret:
             print("Can't receive frame. Exiting ...")
             break
-
-        frame = cv.flip(frame, 1)
 
         tensor = Tensor.from_numpy(frame)
         result = pipeline(tensor)

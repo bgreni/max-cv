@@ -1,0 +1,58 @@
+from benchmark import ThroughputMeasure, BenchId, BenchMetric, Bench, Bencher
+from operations_mojo import Flip
+from .common import *
+from tensor import (
+    Input,
+    Output,
+)
+
+
+comptime FLIP_VERTICAL = 0
+comptime FLIP_HORIZONTAL = 1
+comptime FLIP_BOTH = -1
+
+
+fn run_transform_benchmarks(mut bench: Bench) raises:
+    bench_flip[FLIP_VERTICAL, "flip_vertical"](bench)
+    bench_flip[FLIP_HORIZONTAL, "flip_horizontal"](bench)
+    bench_flip[FLIP_BOTH, "flip_both"](bench)
+
+
+fn bench_flip[flip_code: Int, name: StringLiteral](mut bench: Bench) raises:
+    var cpu = DeviceContext(api="cpu")
+    var outtensor = gen_tensor[Output](cpu)
+    var intensor = gen_tensor[Input](cpu)
+    var els = intensor.size
+    var elements = [ThroughputMeasure(BenchMetric.elements, els)]
+
+    @parameter
+    fn bench_cpu(mut b: Bencher) raises:
+        @parameter
+        @always_inline
+        fn run() raises:
+            Flip.execute["cpu", flip_code](
+                outtensor.tensor, intensor.tensor, cpu
+            )
+
+        b.iter[run]()
+
+    bench.bench_function[bench_cpu](BenchId(name, "cpu"), elements)
+
+    @parameter
+    if has_accelerator():
+        var gpu = DeviceContext()
+        var gpu_outtensor = gen_tensor[Output](gpu)
+        var gpu_intensor = gen_tensor[Input](gpu)
+
+        @parameter
+        fn bench_gpu(mut b: Bencher) raises:
+            @parameter
+            @always_inline
+            fn run() raises:
+                Flip.execute["gpu", flip_code](
+                    gpu_outtensor.tensor, gpu_intensor.tensor, gpu
+                )
+
+            b.iter[run]()
+
+        bench.bench_function[bench_gpu](BenchId(name, "gpu"), elements)

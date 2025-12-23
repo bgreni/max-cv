@@ -49,7 +49,6 @@ fn draw_circle(mut bench: Bench) raises:
         var gpu_outtensor = gen_tensor[Output](gpu)
         var gpu_color = gen_color_tensor(gpu)
 
-
         @parameter
         fn bench_gpu(mut b: Bencher) raises:
             @parameter
@@ -67,4 +66,6 @@ fn draw_circle(mut bench: Bench) raises:
 
             b.iter[run]()
 
-        bench.bench_function[bench_gpu](BenchId("draw_circle", "gpu"), List(elements))
+        bench.bench_function[bench_gpu](
+            BenchId("draw_circle", "gpu"), List(elements)
+        )
