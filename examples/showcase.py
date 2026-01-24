@@ -13,7 +13,7 @@ sys.path.append(str(path_root))
 
 from max_cv import ImagePipeline, load_image_into_tensor  # noqa: E402
 from max_cv import operations as ops  # noqa: E402
-from max.driver import Accelerator, CPU, Device  # noqa: E402
+from max.driver import Accelerator, CPU, Device, accelerator_count  # noqa: E402
 from max.dtype import DType  # noqa: E402
 from max.graph import TensorValue  # noqa: E402
 
@@ -228,13 +228,7 @@ def flip(code):
 
 def run_pipeline(operations: Callable, num_inputs: int = 1):
     # Place the graph on a GPU, if available. Fall back to CPU if not.
-    device: Device
-
-    try:
-        # Unsupported accelerators will throw an error here
-        device = Accelerator() if platform.system() != "Darwin" else CPU()
-    except ValueError:
-        device = CPU()
+    device = CPU() if accelerator_count() == 0 else Accelerator()
 
     # Load our initial image into a device Tensor.
     image_path = Path("examples/resources/bucky_birthday_small.jpeg")

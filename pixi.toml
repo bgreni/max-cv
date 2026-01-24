@@ -47,7 +47,7 @@ mojo = ">=0.26.1.0.dev2025121805,<27"
 
 [dependencies]
 pillow = ">=11.0.0,<12"
-max = ">=26.1.0.dev2025121805,<27"
+max = ">=26.2.0.dev2026012405,<27"
 
 [environments]
 default = { solve-group = "default" }

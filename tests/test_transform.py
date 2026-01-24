@@ -1,5 +1,5 @@
 import numpy as np
-from max.driver import CPU, Tensor
+from max.driver import Buffer, CPU
 from max.dtype import DType
 from max.engine import InferenceSession
 from max.graph import TensorType, DeviceRef
@@ -18,7 +18,7 @@ def test_flip(session: InferenceSession) -> None:
     c2 = c0 + 20
     input_data = np.concatenate([c0, c1, c2], axis=2).astype(np.float32)
 
-    image_tensor = Tensor.from_numpy(input_data).to(device)
+    image_tensor = Buffer.from_numpy(input_data).to(device)
 
     graph_v = make_graph(
         "flip_v",

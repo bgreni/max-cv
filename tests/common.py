@@ -1,5 +1,5 @@
 import numpy as np
-from max.driver import CPU, Device, Tensor
+from max.driver import Buffer, CPU, Device
 from max.dtype import DType
 from max.graph import Graph
 from max.engine import InferenceSession
@@ -9,7 +9,7 @@ from max_cv.io import load_image_into_tensor
 
 def generate_test_tensor(
     device: Device, dtype: DType, shape: tuple = (4, 6, 3)
-) -> Tensor:
+) -> Buffer:
     """Generate a test tensor with realistic image data.
 
     If shape matches standard test image dimensions, loads real image data.
@@ -24,7 +24,7 @@ def generate_test_tensor(
         if dtype != DType.uint8:
             # Convert to float32 and normalize for operations that expect 0-1 range
             img_np = img.to_numpy().astype(np.float32) / 255.0
-            return Tensor.from_numpy(img_np).to(device)
+            return Buffer.from_numpy(img_np).to(device)
         return img.to(device)
     elif shape == (2000, 1500, 3):
         # Load large test image
@@ -33,7 +33,7 @@ def generate_test_tensor(
         )
         if dtype != DType.uint8:
             img_np = img.to_numpy().astype(np.float32) / 255.0
-            return Tensor.from_numpy(img_np).to(device)
+            return Buffer.from_numpy(img_np).to(device)
         return img.to(device)
     else:
         # For other shapes, create realistic synthetic data
@@ -74,10 +74,10 @@ def generate_test_tensor(
         else:
             image_array = image_array.astype(dtype.to_numpy())
 
-        return Tensor.from_numpy(image_array).to(device)
+        return Buffer.from_numpy(image_array).to(device)
 
 
-def run_graph(graph: Graph, input: Tensor, session: InferenceSession) -> Tensor:
+def run_graph(graph: Graph, input: Buffer, session: InferenceSession) -> Buffer:
     model = session.load(graph)
     result = model.execute(input)[0]
     return result.to(CPU())
