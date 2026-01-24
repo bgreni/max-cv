@@ -3,3 +3,4 @@ from .color_correction import *  # noqa: F403
 from .edge_detection import *  # noqa: F403
 from .effects import *  # noqa: F403
 from .draw import *  # noqa: F403
+from .transform import *  # noqa: F403

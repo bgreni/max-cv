@@ -12,10 +12,14 @@ from sys import size_of, has_accelerator, CompilationTarget
 comptime dtype = DType.float32
 comptime rank = 3
 comptime tspec = _static_spec[dtype, rank](
-    shape=DimList(600, 400, 3), strides=DimList(400, 3, 1)
+    shape=DimList(1920, 1080, 3), strides=DimList(1080, 3, 1)
 )
-comptime point_spec = _static_spec[dtype, 1](shape=DimList(2), strides=DimList(1))
-comptime color_spec = _static_spec[dtype, 1](shape=DimList(3), strides=DimList(1))
+comptime point_spec = _static_spec[dtype, 1](
+    shape=DimList(2), strides=DimList(1)
+)
+comptime color_spec = _static_spec[dtype, 1](
+    shape=DimList(3), strides=DimList(1)
+)
 
 
 fn gen_tensor[
@@ -48,12 +52,13 @@ fn _static_spec[
 @fieldwise_init
 struct BenchTensor[
     dtype: DType,
-    rank: Int, //,
+    rank: Int,
+    //,
     io_spec: IOSpec,
     static_spec: StaticTensorSpec[dtype, rank],
 ](Copyable, Movable):
     comptime tensor_type = ManagedTensorSlice[
-        io_spec=Self.io_spec, static_spec=Self.static_spec
+        io_spec = Self.io_spec, static_spec = Self.static_spec
     ]
     comptime buffer_type = DeviceBuffer[Self.dtype]
     comptime ptr_type = UnsafePointer[Scalar[Self.dtype]]
@@ -67,7 +72,7 @@ struct BenchTensor[
         ctx.synchronize()
 
         self.tensor = ManagedTensorSlice[
-            io_spec=Self.io_spec, static_spec=Self.static_spec
+            io_spec = Self.io_spec, static_spec = Self.static_spec
         ](
             self.buffer.unsafe_ptr(),
             Self.static_spec.shape.into_index_list[Self.rank](),

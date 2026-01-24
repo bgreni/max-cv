@@ -211,6 +211,21 @@ def draw_circle(radius, color, width, center):
     )
 
 
+@showcase.command(name="flip")
+@click.option(
+    "--code",
+    type=int,
+    default=1,
+    show_default=True,
+    help="Flip code: 0 for vertical, 1 for horizontal, -1 for both.",
+)
+def flip(code):
+    print("Flipping image with code:", code)
+    run_pipeline(
+        operations=lambda device, input: ops.flip(device, input, ops.FlipCode(code))
+    )
+
+
 def run_pipeline(operations: Callable, num_inputs: int = 1):
     # Place the graph on a GPU, if available. Fall back to CPU if not.
     device: Device
