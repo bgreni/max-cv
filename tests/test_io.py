@@ -1,4 +1,4 @@
-from max.driver import CPU
+from max.driver import CPU, Device
 from max.dtype import DType
 from max.engine import InferenceSession
 from max.graph import TensorType, DeviceRef
@@ -7,8 +7,7 @@ from pathlib import Path
 from .common import generate_test_tensor, run_graph, make_graph
 
 
-def test_load_image_into_tensor() -> None:
-    device = CPU()
+def test_load_image_into_tensor(device: Device) -> None:
     image_path = Path("examples/resources/bucky_birthday_small.jpeg")
     image_tensor = load_image_into_tensor(image_path, device)
     image_tensor = image_tensor.to(CPU())
@@ -17,8 +16,7 @@ def test_load_image_into_tensor() -> None:
     assert shape == (600, 450, 3)
 
 
-def test_normalize_image(session: InferenceSession) -> None:
-    device = CPU()
+def test_normalize_image(session: InferenceSession, device: Device) -> None:
     image_tensor = generate_test_tensor(device, dtype=DType.uint8)
     graph = make_graph(
         "normalize",
@@ -37,8 +35,7 @@ def test_normalize_image(session: InferenceSession) -> None:
     assert result.shape == (4, 6, 3)
 
 
-def test_restore_image(session: InferenceSession) -> None:
-    device = CPU()
+def test_restore_image(session: InferenceSession, device: Device) -> None:
     image_tensor = generate_test_tensor(device, dtype=DType.float32)
     graph = make_graph(
         "restore",

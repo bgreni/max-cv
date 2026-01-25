@@ -1,5 +1,5 @@
 import numpy as np
-from max.driver import Buffer, CPU
+from max.driver import Buffer, Device
 from max.dtype import DType
 from max.engine import InferenceSession
 from max.graph import TensorType, DeviceRef
@@ -8,9 +8,7 @@ from max_cv.operations import FlipCode
 from .common import run_graph, make_graph
 
 
-def test_flip(session: InferenceSession) -> None:
-    device = CPU()
-
+def test_flip(session: InferenceSession, device: Device) -> None:
     width, height = 640, 400
     # Create 640x400 image with 3 channels
     c0 = np.arange(width * height).reshape(height, width, 1)

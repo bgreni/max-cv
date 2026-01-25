@@ -1,5 +1,5 @@
 import numpy as np
-from max.driver import CPU
+from max.driver import Device
 from max.dtype import DType
 from max.engine import InferenceSession
 from max.graph import TensorType, DeviceRef
@@ -7,8 +7,7 @@ import max_cv.operations as ops
 from .common import generate_test_tensor, run_graph, make_graph
 
 
-def test_brightness(session: InferenceSession) -> None:
-    device = CPU()
+def test_brightness(session: InferenceSession, device: Device) -> None:
     image_tensor = generate_test_tensor(
         device, dtype=DType.float32, shape=(100, 100, 3)
     )
@@ -46,8 +45,7 @@ def test_brightness(session: InferenceSession) -> None:
             )
 
 
-def test_gamma(session: InferenceSession) -> None:
-    device = CPU()
+def test_gamma(session: InferenceSession, device: Device) -> None:
     image_tensor = generate_test_tensor(
         device, dtype=DType.float32, shape=(100, 100, 3)
     )
@@ -85,8 +83,7 @@ def test_gamma(session: InferenceSession) -> None:
             )
 
 
-def test_luminance_threshold(session: InferenceSession) -> None:
-    device = CPU()
+def test_luminance_threshold(session: InferenceSession, device: Device) -> None:
     image_tensor = generate_test_tensor(
         device, dtype=DType.float32, shape=(100, 100, 1)
     )
@@ -129,8 +126,7 @@ def test_luminance_threshold(session: InferenceSession) -> None:
     )
 
 
-def test_rgb_to_luminance(session: InferenceSession) -> None:
-    device = CPU()
+def test_rgb_to_luminance(session: InferenceSession, device: Device) -> None:
     image_tensor = generate_test_tensor(
         device, dtype=DType.float32, shape=(100, 100, 3)
     )
@@ -177,8 +173,7 @@ def test_rgb_to_luminance(session: InferenceSession) -> None:
     assert np.all(output_values <= 1), "Output values should be <= 1"
 
 
-def test_luminance_to_rgb(session: InferenceSession) -> None:
-    device = CPU()
+def test_luminance_to_rgb(session: InferenceSession, device: Device) -> None:
     image_tensor = generate_test_tensor(
         device, dtype=DType.float32, shape=(100, 100, 1)
     )
