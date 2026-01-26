@@ -11,7 +11,7 @@ sys.path.append(str(path_root))
 
 from max_cv import ImagePipeline  # noqa: E402
 from max_cv import operations as ops  # noqa: E402
-from max.driver import Accelerator, CPU, Device, Tensor  # noqa: E402
+from max.driver import Buffer, Accelerator, CPU, Device  # noqa: E402
 from max.dtype import DType  # noqa: E402
 from max.graph import TensorValue  # noqa: E402
 
@@ -48,7 +48,7 @@ def sobel(value, camera, file):
 
 
 def create_pipeline(
-    operations: Callable, sample_frame: Tensor, flip: bool = False
+    operations: Callable, sample_frame: Buffer, flip: bool = False
 ) -> ImagePipeline:
     # Place the graph on a GPU, if available. Fall back to CPU if not.
     device: Device
@@ -85,7 +85,7 @@ def run_pipeline_video_file(operations: Callable, path: str):
         return
 
     ret, frame = cap.read()
-    pipeline = create_pipeline(operations, Tensor.from_numpy(frame))
+    pipeline = create_pipeline(operations, Buffer.from_numpy(frame))
 
     width = int(cap.get(cv.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv.CAP_PROP_FRAME_HEIGHT))
@@ -98,7 +98,7 @@ def run_pipeline_video_file(operations: Callable, path: str):
     )
 
     while ret:
-        tensor = Tensor.from_numpy(frame)
+        tensor = Buffer.from_numpy(frame)
         result = pipeline(tensor)
         result = result.to(CPU())
         out.write(result.to_numpy())
@@ -116,7 +116,7 @@ def run_pipeline_live_video(operations: Callable):
         return
 
     ret, frame = cap.read()
-    pipeline = create_pipeline(operations, Tensor.from_numpy(frame), flip=True)
+    pipeline = create_pipeline(operations, Buffer.from_numpy(frame), flip=True)
 
     while True:
         ret, frame = cap.read()
@@ -125,7 +125,7 @@ def run_pipeline_live_video(operations: Callable):
             print("Can't receive frame. Exiting ...")
             break
 
-        tensor = Tensor.from_numpy(frame)
+        tensor = Buffer.from_numpy(frame)
         result = pipeline(tensor)
         result = result.to(CPU())
 

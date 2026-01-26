@@ -1,5 +1,5 @@
 import numpy as np
-from max.driver import CPU, Tensor
+from max.driver import Buffer, Device
 from max.dtype import DType
 from max.engine import InferenceSession
 from max.graph import TensorType, DeviceRef
@@ -8,9 +8,7 @@ from max_cv.operations import FlipCode
 from .common import run_graph, make_graph
 
 
-def test_flip(session: InferenceSession) -> None:
-    device = CPU()
-
+def test_flip(session: InferenceSession, device: Device) -> None:
     width, height = 640, 400
     # Create 640x400 image with 3 channels
     c0 = np.arange(width * height).reshape(height, width, 1)
@@ -18,7 +16,7 @@ def test_flip(session: InferenceSession) -> None:
     c2 = c0 + 20
     input_data = np.concatenate([c0, c1, c2], axis=2).astype(np.float32)
 
-    image_tensor = Tensor.from_numpy(input_data).to(device)
+    image_tensor = Buffer.from_numpy(input_data).to(device)
 
     graph_v = make_graph(
         "flip_v",

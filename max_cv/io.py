@@ -1,5 +1,5 @@
 import numpy as np
-from max.driver import CPU, Device, Tensor
+from max.driver import Buffer, CPU, Device
 from max.dtype import DType
 from max.graph import ops, TensorValue
 from pathlib import Path
@@ -9,9 +9,9 @@ from .operations import luminance_to_rgb
 """Common I/O functionality for loading, saving, and processing images."""
 
 
-def load_image_into_tensor(path: Path, device: Device = CPU()) -> Tensor:
-    """Loads an image from the provided path into a MAX driver Tensor, and
-    moves that Tensor onto a device if needed.
+def load_image_into_tensor(path: Path, device: Device = CPU()) -> Buffer:
+    """Loads an image from the provided path into a MAX driver Buffer, and
+    moves that Buffer onto a device if needed.
 
     Args:
         path: The location of the image to load.
@@ -19,12 +19,11 @@ def load_image_into_tensor(path: Path, device: Device = CPU()) -> Tensor:
         leaves on the CPU.
 
     Returns:
-        A MAX driver Tensor with a UInt8 datatype containing the image in HWC format.
+        A MAX driver Buffer with a UInt8 datatype containing the image in HWC format.
     """
     image = Image.open(path)
     image_array = np.asarray(image)
-    return Tensor.from_numpy(image_array).to(device)
-    # image_shape = image_array.shape
+    return Buffer.from_numpy(image_array).to(device)
 
 
 def normalize_image(image: TensorValue, dtype: DType) -> TensorValue:

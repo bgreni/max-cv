@@ -1,14 +1,11 @@
 from max_cv import ImagePipeline
-from max.driver import CPU
+from max.driver import CPU, Device
 from max.dtype import DType
 import numpy as np
 from .common import generate_test_tensor
 
 
-def test_no_ops_pipeline() -> None:
-    # TODO: Run on all available devices.
-    device = CPU()
-
+def test_no_ops_pipeline(device: Device) -> None:
     image_tensor = generate_test_tensor(device, dtype=DType.uint8)
     input_array = image_tensor.to_numpy()
 

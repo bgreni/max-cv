@@ -1,4 +1,4 @@
-from max.driver import Device, Tensor
+from max.driver import Buffer, Device
 from max.dtype import DType
 from max.engine import InferenceSession, Model
 from max.graph import Graph, Shape, TensorType, TensorValue, DeviceRef
@@ -70,6 +70,6 @@ class ImagePipeline:
 
         self._model = session.load(self._graph)
 
-    def __call__(self, *images: Tensor) -> Tensor:
+    def __call__(self, *images: Buffer) -> Buffer:
         # TODO: Assert that the image tensor resides on the same device.
         return self._model.execute(*images)[0]
