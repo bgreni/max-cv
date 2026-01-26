@@ -3,7 +3,6 @@ from collections.abc import Callable
 from matplotlib import pyplot as plt
 from pathlib import Path
 from PIL import Image
-import platform
 
 # Add search path for the max_cv module.
 import sys
@@ -229,6 +228,11 @@ def flip(code):
 def run_pipeline(operations: Callable, num_inputs: int = 1):
     # Place the graph on a GPU, if available. Fall back to CPU if not.
     device = CPU() if accelerator_count() == 0 else Accelerator()
+
+    # FIXME: Image corruption is occurring on Metal devices specifically in
+    # this showcase. Investigate why and re-enable GPU support when fixed.
+    if device.api == "metal":
+        device = CPU()
 
     # Load our initial image into a device Tensor.
     image_path = Path("examples/resources/bucky_birthday_small.jpeg")
