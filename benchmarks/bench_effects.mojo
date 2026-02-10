@@ -46,6 +46,7 @@ fn pixellate(mut bench: Bench) raises:
                 Pixellate.execute[target="gpu"](
                     gpu_outtensor.tensor, 15, gpu_intensor.tensor, gpu
                 )
+                gpu.synchronize()
 
             b.iter[run]()
 

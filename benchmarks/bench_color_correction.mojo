@@ -47,6 +47,7 @@ fn brightness(mut bench: Bench) raises:
                 Brightness.execute["gpu"](
                     gpu_outtensor.tensor, 0.5, gpu_intensor.tensor, gpu
                 )
+                gpu.synchronize()
 
             b.iter[run]()
 
@@ -85,6 +86,7 @@ fn gamma(mut bench: Bench) raises:
                 Gamma.execute["gpu"](
                     gpu_outtensor.tensor, 0.5, gpu_intensor.tensor, gpu
                 )
+                gpu.synchronize()
 
             b.iter[run]()
 
@@ -123,6 +125,7 @@ fn luminance(mut bench: Bench) raises:
                 Luminance.execute["gpu"](
                     gpu_outtensor.tensor, gpu_intensor.tensor, gpu
                 )
+                gpu.synchronize()
 
             b.iter[run]()
 

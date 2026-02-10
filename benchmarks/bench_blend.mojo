@@ -64,6 +64,7 @@ fn blend(mut bench: Bench) raises:
                         gpu_foreground_image.tensor,
                         gpu,
                     )
+                    gpu.synchronize()
 
                 b.iter[run]()
 

@@ -12,8 +12,13 @@ from sys import size_of, has_accelerator, CompilationTarget
 comptime dtype = DType.float32
 comptime rank = 3
 comptime tspec = _static_spec[dtype, rank](
-    shape=DimList(1920, 1080, 3), strides=DimList(1080, 3, 1)
+    shape=DimList(3840, 2160, 3), strides=DimList(2160 * 3, 3, 1)
 )
+
+comptime tspec_lum = _static_spec[dtype, rank](
+    shape=DimList(3840, 2160, 1), strides=DimList(2160, 1, 1)
+)
+
 comptime point_spec = _static_spec[dtype, 1](
     shape=DimList(2), strides=DimList(1)
 )

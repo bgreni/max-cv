@@ -231,8 +231,8 @@ def run_pipeline(operations: Callable, num_inputs: int = 1):
 
     # FIXME: Image corruption is occurring on Metal devices specifically in
     # this showcase. Investigate why and re-enable GPU support when fixed.
-    if device.api == "metal":
-        device = CPU()
+    # if device.api == "metal":
+    #     device = CPU()
 
     # Load our initial image into a device Tensor.
     image_path = Path("examples/resources/bucky_birthday_small.jpeg")

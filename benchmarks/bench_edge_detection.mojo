@@ -13,8 +13,8 @@ fn run_edge_detection_benchmarks(mut bench: Bench) raises:
 
 fn sobel(mut bench: Bench) raises:
     var cpu = DeviceContext(api="cpu")
-    var intensor = gen_tensor[Input](cpu)
-    var outtensor = gen_tensor[Output](cpu)
+    var intensor = BenchTensor[Input, tspec_lum](cpu).rand()
+    var outtensor = BenchTensor[Output, tspec_lum](cpu).rand()
 
     var els = intensor.size
     var elements = [ThroughputMeasure(BenchMetric.elements, els)]
@@ -35,8 +35,8 @@ fn sobel(mut bench: Bench) raises:
     @parameter
     if has_accelerator():
         var gpu = DeviceContext()
-        var gpu_intensor = gen_tensor[Input](gpu)
-        var gpu_outtensor = gen_tensor[Output](gpu)
+        var gpu_intensor = BenchTensor[Input, tspec_lum](gpu).rand()
+        var gpu_outtensor = BenchTensor[Output, tspec_lum](gpu).rand()
 
         @parameter
         fn bench_gpu(mut b: Bencher) raises:
@@ -46,6 +46,7 @@ fn sobel(mut bench: Bench) raises:
                 SobelEdgeDetection.execute["gpu"](
                     gpu_outtensor.tensor, 0.5, gpu_intensor.tensor, gpu
                 )
+                gpu.synchronize()
 
             b.iter[run]()
 

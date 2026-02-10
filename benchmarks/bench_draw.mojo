@@ -17,8 +17,8 @@ fn draw_circle(mut bench: Bench) raises:
     var outtensor = gen_tensor[Output](cpu)
     var color = gen_color_tensor(cpu)
     var center = BenchTensor[Input, point_spec](cpu)
-    center.tensor[0] = intensor.size // 2
-    center.tensor[1] = intensor.size // 2
+    center.tensor[0] = Float32(intensor.size // 2)
+    center.tensor[1] = Float32(intensor.size // 2)
 
     var els = intensor.size
     var elements = [ThroughputMeasure(BenchMetric.elements, els)]
@@ -47,7 +47,6 @@ fn draw_circle(mut bench: Bench) raises:
         var gpu = DeviceContext()
         var gpu_intensor = gen_tensor[Input](gpu)
         var gpu_outtensor = gen_tensor[Output](gpu)
-        var gpu_color = gen_color_tensor(gpu)
 
         @parameter
         fn bench_gpu(mut b: Bencher) raises:
@@ -58,11 +57,12 @@ fn draw_circle(mut bench: Bench) raises:
                     gpu_outtensor.tensor,
                     gpu_intensor.tensor,
                     120.0,
-                    gpu_color.tensor,
+                    color.tensor,
                     5.0,
                     center.tensor,
                     gpu,
                 )
+                gpu.synchronize()
 
             b.iter[run]()
 

@@ -31,11 +31,3 @@ struct Passthrough:
             return image.load[width](idx)
 
         foreach[func, target=target](output, ctx)
-
-    # You only need to implement this if you do not manually annotate
-    # output shapes in the graph.
-    @staticmethod
-    fn shape(
-        x: InputTensor,
-    ) raises -> IndexList[x.rank]:
-        raise Error("NotImplemented")

@@ -52,6 +52,7 @@ fn bench_flip[flip_code: Int, name: StringLiteral](mut bench: Bench) raises:
                 Flip.execute["gpu", flip_code](
                     gpu_outtensor.tensor, gpu_intensor.tensor, gpu
                 )
+                gpu.synchronize()
 
             b.iter[run]()
 

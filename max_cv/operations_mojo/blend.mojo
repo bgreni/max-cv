@@ -52,6 +52,7 @@ struct Blend:
     ) raises:
         var converted_intensity = intensity.cast[foreground_image.dtype]()
 
+        @__copy_capture(converted_intensity)
         @parameter
         @always_inline
         fn blend[
@@ -81,5 +82,3 @@ struct Blend:
                 return foreground_pixel
 
         foreach[blend, target=target](output, ctx)
-
-        _ = converted_intensity
