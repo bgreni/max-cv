@@ -1,7 +1,7 @@
 import compiler
-from utils.index import Index, IndexList
+from std.utils.index import Index, IndexList
 from tensor import foreach, OutputTensor, InputTensor
-from runtime.asyncrt import DeviceContextPtr
+from std.runtime.asyncrt import DeviceContextPtr
 
 
 @compiler.register("pixellate")
@@ -9,17 +9,17 @@ struct Pixellate:
     """Pixellates an image into small squares."""
 
     @staticmethod
-    fn execute[
+    def execute[
         target: StaticString,
     ](
-        output: OutputTensor,
+        output: OutputTensor[...],
         pixel_width: Int32,
-        image: InputTensor[dtype = output.dtype, rank = output.rank],
+        image: InputTensor[dtype = output.dtype, rank = output.rank, static_spec=...],
         ctx: DeviceContextPtr,
     ) raises:
         @parameter
         @always_inline
-        fn pixellate[
+        def pixellate[
             width: Int
         ](idx: IndexList[image.rank]) -> SIMD[image.dtype, width]:
             var pixel_idx = idx

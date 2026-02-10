@@ -5,17 +5,16 @@ from benchmarks.bench_draw import *
 from benchmarks.bench_edge_detection import *
 from benchmarks.bench_transform import *
 from benchmarks.common import has_accelerator
-from benchmark import Bench
-from sys import has_nvidia_gpu_accelerator, has_amd_gpu_accelerator
-from gpu.host import DeviceContext
+from std.benchmark import Bench
+from std.sys import has_nvidia_gpu_accelerator, has_amd_gpu_accelerator
+from std.gpu.host import DeviceContext
 
 
-fn main() raises:
+def main() raises:
     print("MAX-CV Benchmarks")
     print("================")
 
-    @parameter
-    if has_accelerator():
+    comptime if has_accelerator():
         print("Using GPU:", DeviceContext().name())
     else:
         print("Only benchmarking on CPU.")

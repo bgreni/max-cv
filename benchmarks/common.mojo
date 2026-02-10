@@ -1,52 +1,43 @@
-from math import iota
-from max.driver import cpu
-from buffer.dimlist import DimList
-from gpu.host import DeviceContext, DeviceBuffer
-from tensor import ManagedTensorSlice, StaticTensorSpec, IOSpec, Input
-from memory import AddressSpace
-from memory import UnsafePointer
-from random import rand
-from utils import IndexList
-from sys import size_of, has_accelerator, CompilationTarget
+from std.math import iota
+from std.max.driver import cpu
+from std.gpu.host import DeviceContext, DeviceBuffer
+from tensor import (
+    ManagedTensorSlice,
+    StaticTensorSpec,
+    get_row_major_tensor_spec_static,
+    IOSpec,
+    Input,
+)
+from layout import IntTuple, to_index_list
+from layout.int_tuple import product
+from std.memory import AddressSpace
+from std.memory import UnsafePointer
+from std.random import rand
+from std.utils import IndexList
+from std.sys import size_of, has_accelerator, CompilationTarget
 
 comptime dtype = DType.float32
 comptime rank = 3
-comptime tspec = _static_spec[dtype, rank](
-    shape=DimList(1920, 1080, 3), strides=DimList(1080, 3, 1)
-)
-comptime point_spec = _static_spec[dtype, 1](
-    shape=DimList(2), strides=DimList(1)
-)
-comptime color_spec = _static_spec[dtype, 1](
-    shape=DimList(3), strides=DimList(1)
-)
+comptime tspec = get_row_major_tensor_spec_static[dtype, 3, 3840, 2160, 3]()
+
+comptime tspec_lum = get_row_major_tensor_spec_static[
+    dtype, 3, 3840, 2160, 1
+]()
+
+comptime point_spec = get_row_major_tensor_spec_static[dtype, 1, 2]()
+comptime color_spec = get_row_major_tensor_spec_static[dtype, 1, 3]()
 
 
-fn gen_tensor[
+def gen_tensor[
     iospec: IOSpec
 ](ctx: DeviceContext) raises -> BenchTensor[iospec, tspec]:
     return BenchTensor[iospec, tspec](ctx).rand()
 
 
-fn gen_color_tensor(
+def gen_color_tensor(
     ctx: DeviceContext,
 ) raises -> BenchTensor[Input, color_spec]:
     return BenchTensor[Input, color_spec](ctx).rand()
-
-
-fn _static_spec[
-    dtype: DType, rank: Int
-](shape: DimList, strides: DimList, out spec: StaticTensorSpec[dtype, rank]):
-    spec = type_of(spec)(
-        shape=shape,
-        alignment=size_of[dtype](),
-        strides=strides,
-        address_space=AddressSpace.GENERIC,
-        exclusive=True,
-        in_lambda=None,
-        out_lambda=None,
-        out_compute_lambda=None,
-    )
 
 
 @fieldwise_init
@@ -55,19 +46,19 @@ struct BenchTensor[
     rank: Int,
     //,
     io_spec: IOSpec,
-    static_spec: StaticTensorSpec[dtype, rank],
+    static_spec: StaticTensorSpec[dtype, rank, _],
 ](Copyable, Movable):
     comptime tensor_type = ManagedTensorSlice[
         io_spec = Self.io_spec, static_spec = Self.static_spec
     ]
     comptime buffer_type = DeviceBuffer[Self.dtype]
     comptime ptr_type = UnsafePointer[Scalar[Self.dtype]]
-    comptime size = Int(Self.static_spec.shape.product())
+    comptime size = product(Self.static_spec.shape_tuple)
 
     var tensor: Self.tensor_type
     var buffer: Self.buffer_type
 
-    fn __init__(out self, ctx: DeviceContext) raises:
+    def __init__(out self, ctx: DeviceContext) raises:
         self.buffer = ctx.enqueue_create_buffer[Self.dtype](Self.size)
         ctx.synchronize()
 
@@ -75,19 +66,19 @@ struct BenchTensor[
             io_spec = Self.io_spec, static_spec = Self.static_spec
         ](
             self.buffer.unsafe_ptr(),
-            Self.static_spec.shape.into_index_list[Self.rank](),
-            Self.static_spec.strides.into_index_list[Self.rank](),
+            to_index_list[Self.rank](Self.static_spec.shape_tuple),
+            to_index_list[Self.rank](Self.static_spec.strides_tuple),
         )
 
-    fn unsafe_ptr(self) -> Self.ptr_type:
+    def unsafe_ptr(self) -> Self.ptr_type:
         return self.buffer.unsafe_ptr()
 
-    fn rand(self) raises -> Self:
+    def rand(self) raises -> Self:
         with self.buffer.map_to_host() as host_buffer:
             rand(host_buffer.unsafe_ptr(), Self.size)
             return self.copy()
 
-    fn iota(self) raises -> Self:
+    def iota(self) raises -> Self:
         with self.buffer.map_to_host() as host_buffer:
             iota(host_buffer.unsafe_ptr(), Self.size)
             return self.copy()

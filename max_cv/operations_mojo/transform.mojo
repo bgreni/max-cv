@@ -1,7 +1,7 @@
 import compiler
-from utils.index import Index, IndexList
+from std.utils.index import Index, IndexList
 from tensor import foreach, OutputTensor, InputTensor
-from runtime.asyncrt import DeviceContextPtr
+from std.runtime.asyncrt import DeviceContextPtr
 
 
 @compiler.register("flip")
@@ -9,22 +9,21 @@ struct Flip:
     """Flips an image horizontally or vertically."""
 
     @staticmethod
-    fn execute[
+    def execute[
         target: StaticString,
         flip_code: Int,
     ](
-        output: OutputTensor,
-        image: InputTensor[dtype = output.dtype, rank = output.rank],
+        output: OutputTensor[...],
+        image: InputTensor[dtype = output.dtype, rank = output.rank, static_spec=...],
         ctx: DeviceContextPtr,
     ) raises:
         # Have a different kernel for each to avoid branching
-        @parameter
-        if flip_code >= 0:
+        comptime if flip_code >= 0:
             comptime index = 1 if flip_code >= 1 else 0
 
             @parameter
             @always_inline
-            fn single_flip_kernel[
+            def single_flip_kernel[
                 width: Int
             ](idx: IndexList[image.rank]) -> SIMD[image.dtype, width]:
                 var src_idx = idx
@@ -36,7 +35,7 @@ struct Flip:
 
             @parameter
             @always_inline
-            fn both_flip_kernel[
+            def both_flip_kernel[
                 width: Int
             ](idx: IndexList[image.rank]) -> SIMD[image.dtype, width]:
                 var src_idx = idx

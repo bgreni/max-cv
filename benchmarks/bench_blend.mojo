@@ -1,4 +1,4 @@
-from benchmark import ThroughputMeasure, BenchId, BenchMetric, Bench, Bencher
+from std.benchmark import ThroughputMeasure, BenchId, BenchMetric, Bench, Bencher
 from operations_mojo import Blend
 from .common import *
 from tensor import (
@@ -7,11 +7,11 @@ from tensor import (
 )
 
 
-fn run_blend_benchmarks(mut bench: Bench) raises:
+def run_blend_benchmarks(mut bench: Bench) raises:
     blend(bench)
 
 
-fn blend(mut bench: Bench) raises:
+def blend(mut bench: Bench) raises:
     var cpu = DeviceContext(api="cpu")
     var background_image = gen_tensor[Input](cpu)
     var foreground_image = gen_tensor[Input](cpu)
@@ -23,13 +23,13 @@ fn blend(mut bench: Bench) raises:
     comptime DT = DType.float32
 
     @parameter
-    fn bench_blend[mode: StringLiteral]() raises:
+    def bench_blend[mode: StringLiteral]() raises:
         @parameter
         @always_inline
-        fn bench_cpu(mut b: Bencher) raises:
+        def bench_cpu(mut b: Bencher) raises:
             @parameter
             @always_inline
-            fn run() raises:
+            def run() raises:
                 Blend.execute[DT, mode, "cpu"](
                     outtensor.tensor,
                     0.5,
@@ -44,8 +44,7 @@ fn blend(mut bench: Bench) raises:
             BenchId("blend_" + mode, "cpu"), elements
         )
 
-        @parameter
-        if has_accelerator():
+        comptime if has_accelerator():
             var gpu = DeviceContext()
             var gpu_background_image = gen_tensor[Input](gpu)
             var gpu_foreground_image = gen_tensor[Input](gpu)
@@ -53,10 +52,10 @@ fn blend(mut bench: Bench) raises:
 
             @parameter
             @always_inline
-            fn bench_gpu(mut b: Bencher) raises:
+            def bench_gpu(mut b: Bencher) raises:
                 @parameter
                 @always_inline
-                fn run() raises:
+                def run() raises:
                     Blend.execute[DT, mode, "gpu"](
                         gpu_outtensor.tensor,
                         0.5,
@@ -64,6 +63,7 @@ fn blend(mut bench: Bench) raises:
                         gpu_foreground_image.tensor,
                         gpu,
                     )
+                    gpu.synchronize()
 
                 b.iter[run]()
 

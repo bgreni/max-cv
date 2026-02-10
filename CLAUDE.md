@@ -99,7 +99,7 @@ result = pipeline(image_tensor)
 @compiler.register("operation_name")
 struct OperationName:
     @staticmethod
-    fn execute[target: StaticString](
+    def execute[target: StaticString](
         output: OutputTensor,
         param: Float32,
         image: InputTensor[dtype = output.dtype, rank = output.rank],
@@ -107,7 +107,7 @@ struct OperationName:
     ) raises:
         @parameter
         @always_inline
-        fn kernel[width: Int](idx: IndexList[image.rank]) -> SIMD[image.dtype, width]:
+        def kernel[width: Int](idx: IndexList[image.rank]) -> SIMD[image.dtype, width]:
             # Process pixels here
             return image.load[width](idx) + param
 

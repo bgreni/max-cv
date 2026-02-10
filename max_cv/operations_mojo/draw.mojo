@@ -1,22 +1,22 @@
 import compiler
-from utils.index import Index, IndexList
+from std.utils.index import Index, IndexList
 from tensor import foreach, InputTensor, OutputTensor
-from runtime.asyncrt import DeviceContextPtr
-from math import sqrt
+from std.runtime.asyncrt import DeviceContextPtr
+from std.math import sqrt
 
 
 @compiler.register("draw_circle")
 struct DrawCircle:
     @staticmethod
-    fn execute[
+    def execute[
         target: StaticString
     ](
-        output: OutputTensor,
-        image: InputTensor[dtype = output.dtype, rank = output.rank],
+        output: OutputTensor[...],
+        image: InputTensor[dtype = output.dtype, rank = output.rank, static_spec=...],
         radius: Scalar[output.dtype],
-        color: InputTensor[dtype = output.dtype, rank=1],
+        color: InputTensor[dtype = output.dtype, rank=1, static_spec=...],
         width: Scalar[output.dtype],
-        center: InputTensor[dtype = output.dtype, rank=1],
+        center: InputTensor[dtype = output.dtype, rank=1, static_spec=...],
         ctx: DeviceContextPtr,
     ) raises:
         if color.size() != 3:
@@ -43,7 +43,7 @@ struct DrawCircle:
         )
         @parameter
         @always_inline
-        fn draw[
+        def draw[
             simd_width: Int
         ](idx: IndexList[image.rank]) -> SIMD[image.dtype, simd_width]:
             var i = (Scalar[output.dtype](idx[1]) - cx) ** 2

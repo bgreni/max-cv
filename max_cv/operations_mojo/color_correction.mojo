@@ -1,8 +1,8 @@
 import compiler
-from builtin.simd import _pow
-from utils.index import IndexList
+from std.math import pow
+from std.utils.index import IndexList
 from tensor import OutputTensor, InputTensor, foreach
-from runtime.asyncrt import DeviceContextPtr
+from std.runtime.asyncrt import DeviceContextPtr
 
 
 @compiler.register("brightness")
@@ -10,17 +10,17 @@ struct Brightness:
     """Adjusts the brightness of an image."""
 
     @staticmethod
-    fn execute[
+    def execute[
         target: StaticString,
     ](
-        output: OutputTensor,
+        output: OutputTensor[...],
         brightness: Float32,
-        image: InputTensor[dtype = output.dtype, rank = output.rank],
+        image: InputTensor[dtype = output.dtype, rank = output.rank, static_spec=...],
         ctx: DeviceContextPtr,
     ) raises:
         @parameter
         @always_inline
-        fn add[
+        def add[
             width: Int
         ](idx: IndexList[image.rank]) -> SIMD[image.dtype, width]:
             return image.load[width](idx) + brightness.cast[image.dtype]()
@@ -33,22 +33,22 @@ struct Gamma:
     """Adjusts the gamma of an image."""
 
     @staticmethod
-    fn execute[
+    def execute[
         target: StaticString,
     ](
-        output: OutputTensor,
+        output: OutputTensor[...],
         gamma: Float32,
-        image: InputTensor[dtype = output.dtype, rank = output.rank],
+        image: InputTensor[dtype = output.dtype, rank = output.rank, static_spec=...],
         ctx: DeviceContextPtr,
     ) raises:
         @parameter
         @always_inline
-        fn pow[
+        def gamma_kernel[
             width: Int
         ](idx: IndexList[image.rank]) -> SIMD[image.dtype, width]:
-            return _pow(image.load[width](idx), gamma)
+            return pow(image.load[width](idx), gamma.cast[image.dtype]())
 
-        foreach[pow, target=target](output, ctx)
+        foreach[gamma_kernel, target=target](output, ctx)
 
 
 @compiler.register("luminance")
@@ -56,16 +56,16 @@ struct Luminance:
     """Reduce an RGB image to its luminance channel."""
 
     @staticmethod
-    fn execute[
+    def execute[
         target: StaticString,
     ](
-        output: OutputTensor,
-        image: InputTensor[dtype = output.dtype, rank = output.rank],
+        output: OutputTensor[...],
+        image: InputTensor[dtype = output.dtype, rank = output.rank, static_spec=...],
         ctx: DeviceContextPtr,
     ) raises:
         @parameter
         @always_inline
-        fn luminance[
+        def luminance[
             width: Int
         ](idx: IndexList[image.rank]) -> SIMD[image.dtype, width]:
             var color_idx = idx

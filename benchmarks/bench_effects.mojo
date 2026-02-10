@@ -1,4 +1,4 @@
-from benchmark import ThroughputMeasure, BenchId, BenchMetric, Bench, Bencher
+from std.benchmark import ThroughputMeasure, BenchId, BenchMetric, Bench, Bencher
 from operations_mojo import Pixellate
 from .common import *
 from tensor import (
@@ -7,11 +7,11 @@ from tensor import (
 )
 
 
-fn run_effects_benchmarks(mut bench: Bench) raises:
+def run_effects_benchmarks(mut bench: Bench) raises:
     pixellate(bench)
 
 
-fn pixellate(mut bench: Bench) raises:
+def pixellate(mut bench: Bench) raises:
     var cpu = DeviceContext(api="cpu")
     var intensor = gen_tensor[Input](cpu)
     var outtensor = gen_tensor[Output](cpu)
@@ -20,10 +20,10 @@ fn pixellate(mut bench: Bench) raises:
     var elements = [ThroughputMeasure(BenchMetric.elements, els)]
 
     @parameter
-    fn bench_cpu(mut b: Bencher) raises:
+    def bench_cpu(mut b: Bencher) raises:
         @parameter
         @always_inline
-        fn run() raises:
+        def run() raises:
             Pixellate.execute[target="cpu"](
                 outtensor.tensor, 15, intensor.tensor, cpu
             )
@@ -32,20 +32,20 @@ fn pixellate(mut bench: Bench) raises:
 
     bench.bench_function[bench_cpu](BenchId("pixellate", "cpu"), elements)
 
-    @parameter
-    if has_accelerator():
+    comptime if has_accelerator():
         var gpu = DeviceContext()
         var gpu_intensor = gen_tensor[Input](gpu)
         var gpu_outtensor = gen_tensor[Output](gpu)
 
         @parameter
-        fn bench_gpu(mut b: Bencher) raises:
+        def bench_gpu(mut b: Bencher) raises:
             @parameter
             @always_inline
-            fn run() raises:
+            def run() raises:
                 Pixellate.execute[target="gpu"](
                     gpu_outtensor.tensor, 15, gpu_intensor.tensor, gpu
                 )
+                gpu.synchronize()
 
             b.iter[run]()
 
