@@ -20,9 +20,7 @@ comptime dtype = DType.float32
 comptime rank = 3
 comptime tspec = get_row_major_tensor_spec_static[dtype, 3, 3840, 2160, 3]()
 
-comptime tspec_lum = get_row_major_tensor_spec_static[
-    dtype, 3, 3840, 2160, 1
-]()
+comptime tspec_lum = get_row_major_tensor_spec_static[dtype, 3, 3840, 2160, 1]()
 
 comptime point_spec = get_row_major_tensor_spec_static[dtype, 1, 2]()
 comptime color_spec = get_row_major_tensor_spec_static[dtype, 1, 3]()
@@ -49,7 +47,7 @@ struct BenchTensor[
     static_spec: StaticTensorSpec[dtype, rank, _],
 ](Copyable, Movable):
     comptime tensor_type = ManagedTensorSlice[
-        io_spec = Self.io_spec, static_spec = Self.static_spec
+        io_spec=Self.io_spec, static_spec=Self.static_spec
     ]
     comptime buffer_type = DeviceBuffer[Self.dtype]
     comptime ptr_type = UnsafePointer[Scalar[Self.dtype]]
@@ -63,7 +61,7 @@ struct BenchTensor[
         ctx.synchronize()
 
         self.tensor = ManagedTensorSlice[
-            io_spec = Self.io_spec, static_spec = Self.static_spec
+            io_spec=Self.io_spec, static_spec=Self.static_spec
         ](
             self.buffer.unsafe_ptr(),
             to_index_list[Self.rank](Self.static_spec.shape_tuple),

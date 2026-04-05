@@ -2,6 +2,7 @@ from max.driver import CPU, Device
 from max.dtype import DType
 from max.engine import InferenceSession
 from max.graph import TensorType, DeviceRef
+from max.graph.graph import KernelLibrary
 from max_cv import load_image_into_tensor, normalize_image, restore_image
 from pathlib import Path
 from .common import generate_test_tensor, run_graph, make_graph
@@ -16,10 +17,13 @@ def test_load_image_into_tensor(device: Device) -> None:
     assert shape == (600, 450, 3)
 
 
-def test_normalize_image(session: InferenceSession, device: Device) -> None:
+def test_normalize_image(
+    session: InferenceSession, device: Device, kernel_library: KernelLibrary
+) -> None:
     image_tensor = generate_test_tensor(device, dtype=DType.uint8)
     graph = make_graph(
         "normalize",
+        kernel_library,
         forward=lambda x: normalize_image(x, DType.float32),
         input_types=[
             TensorType(
@@ -35,10 +39,13 @@ def test_normalize_image(session: InferenceSession, device: Device) -> None:
     assert result.shape == (4, 6, 3)
 
 
-def test_restore_image(session: InferenceSession, device: Device) -> None:
+def test_restore_image(
+    session: InferenceSession, device: Device, kernel_library: KernelLibrary
+) -> None:
     image_tensor = generate_test_tensor(device, dtype=DType.float32)
     graph = make_graph(
         "restore",
+        kernel_library,
         forward=lambda x: restore_image(x),
         input_types=[
             TensorType(

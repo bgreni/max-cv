@@ -12,11 +12,13 @@ struct DrawCircle:
         target: StaticString
     ](
         output: OutputTensor[...],
-        image: InputTensor[dtype = output.dtype, rank = output.rank, static_spec=...],
+        image: InputTensor[
+            dtype=output.dtype, rank=output.rank, static_spec=...
+        ],
         radius: Scalar[output.dtype],
-        color: InputTensor[dtype = output.dtype, rank=1, static_spec=...],
+        color: InputTensor[dtype=output.dtype, rank=1, static_spec=...],
         width: Scalar[output.dtype],
-        center: InputTensor[dtype = output.dtype, rank=1, static_spec=...],
+        center: InputTensor[dtype=output.dtype, rank=1, static_spec=...],
         ctx: DeviceContextPtr,
     ) raises:
         if color.size() != 3:

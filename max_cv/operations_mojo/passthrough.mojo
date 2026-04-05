@@ -19,7 +19,9 @@ struct Passthrough:
         # as num_dps_outputs=1, the first argument is the "output"
         output: OutputTensor[...],
         # starting here are the list of inputs
-        image: InputTensor[dtype = output.dtype, rank = output.rank, static_spec=...],
+        image: InputTensor[
+            dtype=output.dtype, rank=output.rank, static_spec=...
+        ],
         # the context is needed for some GPU calls
         ctx: DeviceContextPtr,
     ) raises:

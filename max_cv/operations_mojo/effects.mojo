@@ -14,7 +14,9 @@ struct Pixellate:
     ](
         output: OutputTensor[...],
         pixel_width: Int32,
-        image: InputTensor[dtype = output.dtype, rank = output.rank, static_spec=...],
+        image: InputTensor[
+            dtype=output.dtype, rank=output.rank, static_spec=...
+        ],
         ctx: DeviceContextPtr,
     ) raises:
         @parameter

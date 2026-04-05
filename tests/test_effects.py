@@ -4,16 +4,20 @@ from max.driver import Accelerator, Device
 from max.dtype import DType
 from max.engine import InferenceSession
 from max.graph import TensorType, DeviceRef
+from max.graph.graph import KernelLibrary
 import max_cv.operations as ops
 from .common import generate_test_tensor, run_graph, make_graph
 
 
-def test_pixellate(session: InferenceSession, device: Device) -> None:
+def test_pixellate(
+    session: InferenceSession, device: Device, kernel_library: KernelLibrary
+) -> None:
     image_tensor = generate_test_tensor(
         device, dtype=DType.float32, shape=(100, 100, 3)
     )
     graph = make_graph(
         "pixellate",
+        kernel_library,
         forward=lambda x: ops.pixellate(device, x, 10),
         input_types=[
             TensorType(
@@ -52,7 +56,9 @@ def test_pixellate(session: InferenceSession, device: Device) -> None:
                     )
 
 
-def test_gaussian_blur(session: InferenceSession, device: Device) -> None:
+def test_gaussian_blur(
+    session: InferenceSession, device: Device, kernel_library: KernelLibrary
+) -> None:
     # FIXME: There's a bug in the Gaussian blur on GPU that causes it to
     # produce values > 1, skip until diagnosed.
     if isinstance(device, Accelerator):
@@ -64,6 +70,7 @@ def test_gaussian_blur(session: InferenceSession, device: Device) -> None:
 
     graph = make_graph(
         "gaussian blur",
+        kernel_library,
         forward=lambda x: ops.gaussian_blur(device, x, 3, 3.0, True),
         input_types=[
             TensorType(

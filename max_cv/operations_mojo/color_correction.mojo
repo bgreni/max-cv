@@ -15,7 +15,9 @@ struct Brightness:
     ](
         output: OutputTensor[...],
         brightness: Float32,
-        image: InputTensor[dtype = output.dtype, rank = output.rank, static_spec=...],
+        image: InputTensor[
+            dtype=output.dtype, rank=output.rank, static_spec=...
+        ],
         ctx: DeviceContextPtr,
     ) raises:
         @parameter
@@ -38,7 +40,9 @@ struct Gamma:
     ](
         output: OutputTensor[...],
         gamma: Float32,
-        image: InputTensor[dtype = output.dtype, rank = output.rank, static_spec=...],
+        image: InputTensor[
+            dtype=output.dtype, rank=output.rank, static_spec=...
+        ],
         ctx: DeviceContextPtr,
     ) raises:
         @parameter
@@ -60,7 +64,9 @@ struct Luminance:
         target: StaticString,
     ](
         output: OutputTensor[...],
-        image: InputTensor[dtype = output.dtype, rank = output.rank, static_spec=...],
+        image: InputTensor[
+            dtype=output.dtype, rank=output.rank, static_spec=...
+        ],
         ctx: DeviceContextPtr,
     ) raises:
         @parameter

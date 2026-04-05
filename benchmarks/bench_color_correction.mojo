@@ -1,4 +1,10 @@
-from std.benchmark import ThroughputMeasure, BenchId, BenchMetric, Bench, Bencher
+from std.benchmark import (
+    ThroughputMeasure,
+    BenchId,
+    BenchMetric,
+    Bench,
+    Bencher,
+)
 from operations_mojo import Luminance, Gamma, Brightness
 from .common import *
 from tensor import (

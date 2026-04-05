@@ -3,16 +3,20 @@ from max.driver import Device
 from max.dtype import DType
 from max.engine import InferenceSession
 from max.graph import TensorType, DeviceRef
+from max.graph.graph import KernelLibrary
 import max_cv.operations as ops
 from .common import generate_test_tensor, run_graph, make_graph
 
 
-def test_brightness(session: InferenceSession, device: Device) -> None:
+def test_brightness(
+    session: InferenceSession, device: Device, kernel_library: KernelLibrary
+) -> None:
     image_tensor = generate_test_tensor(
         device, dtype=DType.float32, shape=(100, 100, 3)
     )
     graph = make_graph(
         "brightness",
+        kernel_library,
         forward=lambda x: ops.brightness(device, x, 0.5),
         input_types=[
             TensorType(
@@ -45,12 +49,15 @@ def test_brightness(session: InferenceSession, device: Device) -> None:
             )
 
 
-def test_gamma(session: InferenceSession, device: Device) -> None:
+def test_gamma(
+    session: InferenceSession, device: Device, kernel_library: KernelLibrary
+) -> None:
     image_tensor = generate_test_tensor(
         device, dtype=DType.float32, shape=(100, 100, 3)
     )
     graph = make_graph(
         "gamma",
+        kernel_library,
         forward=lambda x: ops.gamma(device, x, 1.5),
         input_types=[
             TensorType(
@@ -83,12 +90,15 @@ def test_gamma(session: InferenceSession, device: Device) -> None:
             )
 
 
-def test_luminance_threshold(session: InferenceSession, device: Device) -> None:
+def test_luminance_threshold(
+    session: InferenceSession, device: Device, kernel_library: KernelLibrary
+) -> None:
     image_tensor = generate_test_tensor(
         device, dtype=DType.float32, shape=(100, 100, 1)
     )
     graph = make_graph(
         "luminance_threshold",
+        kernel_library,
         forward=lambda x: ops.luminance_threshold(device, x, threshold=0.5),
         input_types=[
             TensorType(
@@ -126,12 +136,15 @@ def test_luminance_threshold(session: InferenceSession, device: Device) -> None:
     )
 
 
-def test_rgb_to_luminance(session: InferenceSession, device: Device) -> None:
+def test_rgb_to_luminance(
+    session: InferenceSession, device: Device, kernel_library: KernelLibrary
+) -> None:
     image_tensor = generate_test_tensor(
         device, dtype=DType.float32, shape=(100, 100, 3)
     )
     graph = make_graph(
         "rgb_to_luminance",
+        kernel_library,
         forward=lambda x: ops.rgb_to_luminance(device, x),
         input_types=[
             TensorType(
@@ -173,12 +186,15 @@ def test_rgb_to_luminance(session: InferenceSession, device: Device) -> None:
     assert np.all(output_values <= 1), "Output values should be <= 1"
 
 
-def test_luminance_to_rgb(session: InferenceSession, device: Device) -> None:
+def test_luminance_to_rgb(
+    session: InferenceSession, device: Device, kernel_library: KernelLibrary
+) -> None:
     image_tensor = generate_test_tensor(
         device, dtype=DType.float32, shape=(100, 100, 1)
     )
     graph = make_graph(
         "luminance_to_rgb",
+        kernel_library,
         forward=lambda x: ops.luminance_to_rgb(x),
         input_types=[
             TensorType(

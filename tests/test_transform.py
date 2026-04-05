@@ -3,12 +3,15 @@ from max.driver import Buffer, Device
 from max.dtype import DType
 from max.engine import InferenceSession
 from max.graph import TensorType, DeviceRef
+from max.graph.graph import KernelLibrary
 import max_cv.operations as ops
 from max_cv.operations import FlipCode
 from .common import run_graph, make_graph
 
 
-def test_flip(session: InferenceSession, device: Device) -> None:
+def test_flip(
+    session: InferenceSession, device: Device, kernel_library: KernelLibrary
+) -> None:
     width, height = 640, 400
     # Create 640x400 image with 3 channels
     c0 = np.arange(width * height).reshape(height, width, 1)
@@ -20,6 +23,7 @@ def test_flip(session: InferenceSession, device: Device) -> None:
 
     graph_v = make_graph(
         "flip_v",
+        kernel_library,
         forward=lambda x: ops.flip(device, x, FlipCode.VERTICAL),
         input_types=[
             TensorType(
@@ -39,6 +43,7 @@ def test_flip(session: InferenceSession, device: Device) -> None:
 
     graph_h = make_graph(
         "flip_h",
+        kernel_library,
         forward=lambda x: ops.flip(device, x, FlipCode.HORIZONTAL),
         input_types=[
             TensorType(
@@ -58,6 +63,7 @@ def test_flip(session: InferenceSession, device: Device) -> None:
 
     graph_b = make_graph(
         "flip_b",
+        kernel_library,
         forward=lambda x: ops.flip(device, x, FlipCode.BOTH),
         input_types=[
             TensorType(

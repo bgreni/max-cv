@@ -14,7 +14,9 @@ struct Flip:
         flip_code: Int,
     ](
         output: OutputTensor[...],
-        image: InputTensor[dtype = output.dtype, rank = output.rank, static_spec=...],
+        image: InputTensor[
+            dtype=output.dtype, rank=output.rank, static_spec=...
+        ],
         ctx: DeviceContextPtr,
     ) raises:
         # Have a different kernel for each to avoid branching

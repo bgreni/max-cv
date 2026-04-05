@@ -46,8 +46,12 @@ struct Blend:
     ](
         output: OutputTensor[dtype=type, static_spec=...],
         intensity: Float32,
-        background_image: InputTensor[dtype=type, rank = output.rank, static_spec=...],
-        foreground_image: InputTensor[dtype=type, rank = output.rank, static_spec=...],
+        background_image: InputTensor[
+            dtype=type, rank=output.rank, static_spec=...
+        ],
+        foreground_image: InputTensor[
+            dtype=type, rank=output.rank, static_spec=...
+        ],
         ctx: DeviceContextPtr,
     ) raises:
         var converted_intensity = intensity.cast[foreground_image.dtype]()
@@ -64,15 +68,15 @@ struct Blend:
             var background_pixel = background_image.load[width](idx)
 
             comptime if blend_mode == "add":
-                return _add[float_dtype = foreground_image.dtype](
+                return _add[float_dtype=foreground_image.dtype](
                     foreground_pixel, background_pixel, converted_intensity
                 )
             elif blend_mode == "dissolve":
-                return _mix[float_dtype = foreground_image.dtype](
+                return _mix[float_dtype=foreground_image.dtype](
                     foreground_pixel, background_pixel, converted_intensity
                 )
             elif blend_mode == "multiply":
-                return _multiply[float_dtype = foreground_image.dtype](
+                return _multiply[float_dtype=foreground_image.dtype](
                     foreground_pixel, background_pixel, converted_intensity
                 )
             else:

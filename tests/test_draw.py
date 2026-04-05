@@ -3,11 +3,14 @@ from max.driver import Device
 from max.dtype import DType
 from max.engine import InferenceSession
 from max.graph import TensorType, DeviceRef
+from max.graph.graph import KernelLibrary
 import max_cv.operations as ops
 from .common import generate_test_tensor, run_graph, make_graph
 
 
-def test_draw(session: InferenceSession, device: Device) -> None:
+def test_draw(
+    session: InferenceSession, device: Device, kernel_library: KernelLibrary
+) -> None:
     input_shape = (100, 100, 3)
     image_tensor = generate_test_tensor(
         device,
@@ -16,6 +19,7 @@ def test_draw(session: InferenceSession, device: Device) -> None:
     )
     graph = make_graph(
         "draw_circle",
+        kernel_library,
         forward=lambda x: ops.draw_circle(device, x, 4, (1.0, 0.0, 0.0), 1),
         input_types=[
             TensorType(

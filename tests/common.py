@@ -2,6 +2,7 @@ import numpy as np
 from max.driver import Buffer, CPU, Device
 from max.dtype import DType
 from max.graph import Graph
+from max.graph.graph import KernelLibrary
 from max.engine import InferenceSession
 from pathlib import Path
 from max_cv.io import load_image_into_tensor
@@ -83,9 +84,9 @@ def run_graph(graph: Graph, input: Buffer, session: InferenceSession) -> Buffer:
     return result.to(CPU())
 
 
-def make_graph(name, **kwargs) -> Graph:
+def make_graph(name, kernel_library: KernelLibrary, **kwargs) -> Graph:
     return Graph(
         name,
         **kwargs,
-        custom_extensions=[Path(__file__).parent / ".." / "max_cv" / "operations_mojo"],
+        kernel_library=kernel_library,
     )
